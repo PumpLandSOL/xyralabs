@@ -154,15 +154,30 @@ html.js .reveal.in {
 
 .labels {
   display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px 24px;
+  align-items: center;
+  gap: 16px;
   font-family: var(--font-mono);
   font-size: 10px;
   line-height: 1;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ice);
+}
+/* Each word owns an equal share of the row; a hairline leader carries the eye to the next one. */
+.labels span {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1 1 0;
+  min-width: 0;
+  white-space: nowrap;
+}
+.labels span:last-child { flex: 0 0 auto; }
+.labels span:not(:last-child)::after {
+  content: "";
+  flex: 1;
+  min-width: 12px;
+  border-top: 1px solid var(--line);
 }
 
 .spread {
