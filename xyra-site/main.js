@@ -354,7 +354,16 @@
     var width = 0, height = 0, dpr = 1, rafId = 0, running = false;
     var start = performance.now();
     var targetX = 0, targetY = 0, curX = 0, curY = 0;
-    var enter = reduceMotion ? 1 : 0, enterStart = 0, entered = reduceMotion;
+    var enter = reduceMotion ? 1 : 0;
+
+    /* How far the section has scrolled into view: 0 as its top meets the bottom of the
+       viewport, 1 once it is 70% of the way up. */
+    function progress() {
+      if (reduceMotion) return 1;
+      var r = section.getBoundingClientRect();
+      var vh = window.innerHeight || 1;
+      return Math.max(0, Math.min(1, (vh - r.top) / (vh * 0.7)));
+    }
 
     function resize() {
       var rect = canvas.getBoundingClientRect();
@@ -364,6 +373,7 @@
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      enter = progress();
       draw(0);
     }
 
@@ -376,12 +386,14 @@
       for (var i = 0; i < angles.length; i++) {
         var drift = Math.sin(t * 0.25 + seeds[i] * 6.28) * 1.5;
         var a = (angles[i] + drift) * Math.PI / 180;
-        /* Each ray starts a little later than the last and eases out to the edge. */
-        var local = Math.max(0, Math.min(1, (enter - seeds[i] * 0.4) / 0.6));
+        /* Each ray slides in from the edge toward the centre as the section scrolls in,
+           a little later than the one before it. */
+        var local = Math.max(0, Math.min(1, (enter - seeds[i] * 0.45) / 0.55));
         local = 1 - Math.pow(1 - local, 3);
         if (local <= 0) continue;
-        var r0 = inner + seeds[i] * inner * 0.9;
-        var r1 = r0 + (reach - r0) * local;
+        var rIn = inner + seeds[i] * inner * 0.9;
+        var r0 = reach - (reach - rIn) * local;
+        var r1 = reach;
         var x0 = cx + Math.cos(a) * r0, y0 = cy + Math.sin(a) * r0;
         var x1 = cx + Math.cos(a) * r1, y1 = cy + Math.sin(a) * r1;
         ctx.lineCap = "round";
@@ -396,7 +408,7 @@
 
     function frame(now) {
       if (!running) return;
-      if (entered && enter < 1) enter = Math.min(1, (now - enterStart) / 1600);
+      enter = progress();
       curX += (targetX - curX) * 0.05;
       curY += (targetY - curY) * 0.05;
       draw((now - start) / 1000);
@@ -407,14 +419,9 @@
 
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) {
-          if (!e.isIntersecting) { pause(); return; }
-          if (!entered && e.intersectionRatio >= 0.2) { entered = true; enterStart = performance.now(); }
-          play();
-        });
-      }, { threshold: [0, 0.2] }).observe(section);
+        entries.forEach(function (e) { if (e.isIntersecting) play(); else pause(); });
+      }, { threshold: 0 }).observe(section);
     } else {
-      entered = true; enterStart = performance.now();
       play();
     }
 
