@@ -161,7 +161,8 @@
       if (p === progress) return;
       progress = p;
       inner.style.opacity = String(1 - p);
-      inner.style.transform = "translateY(" + (-60 * p).toFixed(1) + "px) scale(" + (1 - 0.08 * p).toFixed(3) + ")";
+      inner.style.transform = "translateY(" + (-40 * p).toFixed(1) + "px) scale(" + (1 + 0.22 * p).toFixed(3) + ")";
+      inner.style.filter = "blur(" + (12 * p).toFixed(1) + "px)";
       canvas.style.opacity = String(1 - p * 0.75);
       if (p >= 1) pause(); else play();
     }
@@ -353,6 +354,7 @@
     var width = 0, height = 0, dpr = 1, rafId = 0, running = false;
     var start = performance.now();
     var targetX = 0, targetY = 0, curX = 0, curY = 0;
+    var enter = reduceMotion ? 1 : 0, enterStart = 0, entered = reduceMotion;
 
     function resize() {
       var rect = canvas.getBoundingClientRect();
@@ -374,15 +376,19 @@
       for (var i = 0; i < angles.length; i++) {
         var drift = Math.sin(t * 0.25 + seeds[i] * 6.28) * 1.5;
         var a = (angles[i] + drift) * Math.PI / 180;
+        /* Each ray starts a little later than the last and eases out to the edge. */
+        var local = Math.max(0, Math.min(1, (enter - seeds[i] * 0.4) / 0.6));
+        local = 1 - Math.pow(1 - local, 3);
+        if (local <= 0) continue;
         var r0 = inner + seeds[i] * inner * 0.9;
-        var r1 = reach;
+        var r1 = r0 + (reach - r0) * local;
         var x0 = cx + Math.cos(a) * r0, y0 = cy + Math.sin(a) * r0;
         var x1 = cx + Math.cos(a) * r1, y1 = cy + Math.sin(a) * r1;
         ctx.lineCap = "round";
-        ctx.strokeStyle = "rgba(255,255,255,0.12)";
+        ctx.strokeStyle = "rgba(255,255,255," + (0.12 * local).toFixed(3) + ")";
         ctx.lineWidth = 6;
         ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
-        ctx.strokeStyle = "rgba(255,255,255," + (0.55 + seeds[i] * 0.45).toFixed(2) + ")";
+        ctx.strokeStyle = "rgba(255,255,255," + ((0.55 + seeds[i] * 0.45) * local).toFixed(2) + ")";
         ctx.lineWidth = 1.6;
         ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
       }
@@ -390,6 +396,7 @@
 
     function frame(now) {
       if (!running) return;
+      if (entered && enter < 1) enter = Math.min(1, (now - enterStart) / 1600);
       curX += (targetX - curX) * 0.05;
       curY += (targetY - curY) * 0.05;
       draw((now - start) / 1000);
@@ -400,9 +407,14 @@
 
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) { if (e.isIntersecting) play(); else pause(); });
-      }, { threshold: 0.05 }).observe(section);
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) { pause(); return; }
+          if (!entered && e.intersectionRatio >= 0.2) { entered = true; enterStart = performance.now(); }
+          play();
+        });
+      }, { threshold: [0, 0.2] }).observe(section);
     } else {
+      entered = true; enterStart = performance.now();
       play();
     }
 
@@ -418,6 +430,65 @@
     if ("ResizeObserver" in window) new ResizeObserver(resize).observe(canvas);
     else window.addEventListener("resize", resize);
     resize();
+  }
+
+  /* Spread headlines: the words start gathered in the centre, read as a sentence,
+     and move out to their places as the heading rises into view. */
+  function spreadWords() {
+    var heads = Array.prototype.slice.call(document.querySelectorAll(".spread"));
+    if (!heads.length || reduceMotion) return;
+    var items = heads.map(function (h) {
+      return { el: h, words: Array.prototype.slice.call(h.children), offsets: [], skip: false };
+    }).filter(function (it) { return it.words.length > 1; });
+    var ticking = false;
+
+    function measure() {
+      items.forEach(function (it) {
+        it.words.forEach(function (w) { w.style.transform = ""; });
+        var hr = it.el.getBoundingClientRect();
+        var cx = hr.left + hr.width / 2;
+        var tops = [];
+        it.offsets = it.words.map(function (w) {
+          var r = w.getBoundingClientRect();
+          tops.push(Math.round(r.top));
+          return cx - (r.left + r.width / 2);
+        });
+        /* Once the words wrap onto several lines there is nothing to spread. */
+        it.skip = tops.some(function (t) { return Math.abs(t - tops[0]) > 4; });
+      });
+      update();
+    }
+
+    function update() {
+      ticking = false;
+      var vh = window.innerHeight;
+      items.forEach(function (it) {
+        if (it.skip) return;
+        var r = it.el.getBoundingClientRect();
+        var p = Math.max(0, Math.min(1, (vh - r.top) / (vh * 0.6)));
+        var e = 1 - Math.pow(1 - p, 3);
+        it.words.forEach(function (w, i) {
+          w.style.transform = "translate3d(" + (it.offsets[i] * (1 - e)).toFixed(1) + "px,0,0)";
+        });
+      });
+    }
+
+    window.addEventListener("scroll", function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    }, { passive: true });
+
+    var timer = 0;
+    function queueMeasure() { clearTimeout(timer); timer = setTimeout(measure, 80); }
+    if ("ResizeObserver" in window) {
+      var ro = new ResizeObserver(queueMeasure);
+      items.forEach(function (it) { ro.observe(it.el); });
+    } else {
+      window.addEventListener("resize", queueMeasure);
+    }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+    measure();
   }
 
   /* Smooth scrolling through Lenis when it loaded; anchors go through it too. */
@@ -462,6 +533,7 @@
   ledgerTile();
   header();
   reveals();
+  spreadWords();
   activeNav();
   carousel();
   rays();
