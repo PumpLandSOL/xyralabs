@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>XYRA Labs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="XYRA is a proof-of-work layer 1 where every transaction is shielded and every part is post-quantum, so nothing recorded today can be decrypted later.">
+<meta name="theme-color" content="#0b0b0b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 48 48'%3E%3Crect x='-4' y='-4' width='48' height='48' fill='%230b0b0b'/%3E%3Cg fill='%23e8e4dc'%3E%3Crect width='12' height='12'/%3E%3Crect x='14' width='12' height='12'/%3E%3Crect x='28' width='12' height='12'/%3E%3Crect y='14' width='12' height='12'/%3E%3Crect x='28' y='14' width='12' height='12'/%3E%3Crect y='28' width='12' height='12'/%3E%3Crect x='14' y='28' width='12' height='12'/%3E%3C/g%3E%3Crect x='28' y='28' width='12' height='12' fill='%23ffffff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mark" viewBox="0 0 40 40">
+    <g fill="currentColor">
+      <rect x="0" y="0" width="12" height="12"/>
+      <rect x="14" y="0" width="12" height="12"/>
+      <rect x="28" y="0" width="12" height="12"/>
+      <rect x="0" y="14" width="12" height="12"/>
+      <rect x="28" y="14" width="12" height="12"/>
+      <rect x="0" y="28" width="12" height="12"/>
+      <rect x="14" y="28" width="12" height="12"/>
+    </g>
+    <rect x="28" y="28" width="12" height="12" fill="#ffffff"/>
+  </symbol>
+  <symbol id="spark" viewBox="0 0 48 48">
+    <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <path d="M24 3v42"/>
+      <path d="M5 24h38"/>
+      <path d="M10 8l27 31"/>
+      <path d="M39 9L8 38"/>
+      <path d="M21 4l5 8"/>
+      <path d="M12 7l5 7"/>
+      <path d="M44 29l-8-3"/>
+      <path d="M6 31l9-4"/>
+    </g>
+  </symbol>
+</svg>
+
+<a class="skip" href="#threat">Skip to content</a>
+
+<header class="site-header" id="header">
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="XYRA Labs home">
+      <svg class="mark" aria-hidden="true"><use href="#mark"/></svg>
+      <span class="brand-name">XYRA</span><span class="brand-sub">Labs</span>
+    </a>
+    <nav aria-label="Sections">
+      <ul class="nav-links">
+        <li><a href="#top">Home</a></li>
+        <li><a href="#threat">Threat</a></li>
+        <li><a href="#design">Design</a></li>
+        <li><a href="#payment">Payments</a></li>
+        <li><a href="#compare">Compare</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+      </ul>
+    </nav>
+    <a class="btn" href="#follow">Follow along <span aria-hidden="true">↗</span></a>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="hero" id="top" aria-labelledby="hero-title">
+    <canvas id="field" aria-hidden="true"></canvas>
+    <div class="hero-inner" id="hero-inner">
+      <p class="eyebrow word" style="--i:0">Layer 1 · Shielded by default · Post-quantum</p>
+      <h1 class="display" id="hero-title">
+        <span class="word" style="--i:1">Privacy</span>
+        <span class="word" style="--i:2">that</span>
+        <span class="word" style="--i:3"><em>outlives</em></span>
+        <span class="word" style="--i:4">the</span>
+        <span class="word" style="--i:5">quantum</span>
+        <span class="word" style="--i:6">computer.</span>
+      </h1>
+    </div>
+    <a class="scroll-cue" href="#threat" aria-label="Scroll to the threat">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
+    </a>
+  </section>
+
+  <div class="after-hero">
+
+    <section class="section" id="threat" aria-labelledby="threat-title">
+      <div class="wrap">
+        <div class="labels reveal" aria-hidden="true">
+          <span>What</span><span>happens</span><span>after</span><span>Q-day</span>
+        </div>
+        <h2 class="spread reveal" id="threat-title">
+          <span>Record.</span><span>Wait.</span><span><em>Decrypt.</em></span>
+        </h2>
+        <p class="statement center reveal">Blockchains are public and permanent. Anyone can keep a copy of every transaction and wait for a quantum computer that can run Shor's algorithm. On that day, the elliptic-curve math behind today's privacy coins stops protecting anything that was ever recorded.</p>
+
+        <div class="frame grid-frame reveal">
+          <div class="cell">
+            <p class="cell-name">Stealth addresses</p>
+            <p class="cell-meta">Elliptic-curve Diffie-Hellman</p>
+          </div>
+          <div class="cell">
+            <p class="cell-name">Note encryption</p>
+            <p class="cell-meta">Keys from elliptic curves</p>
+          </div>
+          <div class="cell">
+            <p class="cell-name">Key images</p>
+            <p class="cell-meta">Discrete log</p>
+          </div>
+          <div class="cell">
+            <p class="cell-name">Value commitments</p>
+            <p class="cell-meta">Pedersen</p>
+          </div>
+          <div class="cell">
+            <p class="cell-name">Spend proofs</p>
+            <p class="cell-meta">Halo 2 · Groth16</p>
+          </div>
+          <div class="cell">
+            <p class="cell-name">Signatures</p>
+            <p class="cell-meta">EdDSA · RedPallas</p>
+          </div>
+          <div class="panel">
+            <span class="corner tl">Every</span>
+            <span class="corner tr">Past</span>
+            <span class="corner bl">Payment</span>
+            <span class="corner br">Exposed</span>
+            <a class="btn btn-ghost" href="#design">See the design <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+
+        <p class="aside center reveal">A fork can fix theft and inflation. It can't fix privacy, because the old data is already out there. <span>That's why XYRA is post-quantum from the first block.</span></p>
+      </div>
+    </section>
+
+    <section class="section pinned" id="design" aria-labelledby="design-title">
+      <div class="wrap">
+        <h2 class="lead reveal" id="design-title">
+          <svg class="spark" aria-hidden="true"><use href="#spark"/></svg>
+          <span>Meet the <em>primitives</em> that replace every curve with <em>hashes</em> and <em>lattices</em>:</span>
+        </h2>
+
+        <div class="carousel" id="carousel">
+          <ul class="track" id="track">
+            <li class="slide" data-name="zk-STARK" data-meta="Hash-based · No trusted setup" data-quote="Proves you own an unspent note and that the amounts balance. Its security comes from hash functions alone, and it needs no trusted setup.">
+              <div class="tile">
+                <p class="tile-label">Spend proofs</p>
+                <p class="tile-name">zk-STARK</p>
+                <p class="tile-meta">Replaces <s>Groth16</s> <s>Halo 2</s></p>
+              </div>
+            </li>
+            <li class="slide" data-name="ML-KEM-768" data-meta="NIST FIPS 203 · Lattice" data-quote="NIST's post-quantum key exchange standard. Every payment gets a fresh secret that only the recipient can open, and nothing in it depends on a curve.">
+              <div class="tile">
+                <p class="tile-label">Stealth addresses</p>
+                <p class="tile-name">ML-KEM-768</p>
+                <p class="tile-meta">Replaces <s>Elliptic-curve Diffie-Hellman</s></p>
+              </div>
+            </li>
+            <li class="slide" data-name="ChaCha20-Poly1305" data-meta="256-bit keys · 128 bits after Grover" data-quote="Each note is sealed with a 256-bit key taken from the ML-KEM secret. Grover's algorithm only halves that, which still leaves 128 bits of security.">
+              <div class="tile">
+                <p class="tile-label">Note encryption</p>
+                <p class="tile-name">ChaCha20-Poly1305</p>
+                <p class="tile-meta">Replaces <s>Keys from elliptic curves</s></p>
+              </div>
+            </li>
+            <li class="slide" data-name="Poseidon2" data-meta="256-bit outputs · Proof-friendly" data-quote="Notes, the note tree, and the nullifiers that stop double spends are all hashes. There's no commitment a quantum computer could open two ways.">
+              <div class="tile">
+                <p class="tile-label">Commitments and nullifiers</p>
+                <p class="tile-name">Poseidon2</p>
+                <p class="tile-meta">Replaces <s>Pedersen</s> <s>Sinsemilla</s></p>
+              </div>
+            </li>
+            <li class="slide" data-name="Balance in the proof" data-meta="Inputs = outputs + fee" data-quote="Inputs equal outputs plus the fee, enforced inside the STARK itself. Nobody can mint coins by breaking a commitment, because there is no commitment to break.">
+              <div class="tile">
+                <p class="tile-label">Value balance</p>
+                <p class="tile-name">Checked in the proof</p>
+                <p class="tile-meta">Replaces <s>Pedersen value commitments</s></p>
+              </div>
+            </li>
+            <li class="slide" data-name="CPU proof of work" data-meta="Hashes only · Any laptop can mine" data-quote="Mining only uses hashes, so blocks carry nothing a quantum computer can forge. There are no validator signatures to replace, and any laptop can take part.">
+              <div class="tile">
+                <p class="tile-label">Consensus</p>
+                <p class="tile-name">CPU proof of work</p>
+                <p class="tile-meta">No block signatures to forge</p>
+              </div>
+            </li>
+          </ul>
+
+          <div class="caption" aria-live="polite">
+            <p class="quote"><span class="quote-mark" aria-hidden="true">“</span><span id="caption-quote"></span></p>
+            <div class="caption-meta">
+              <span id="caption-name"></span>
+              <span id="caption-detail"></span>
+            </div>
+          </div>
+
+          <div class="dots" role="tablist" aria-label="Primitives" id="dots"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="over">
+
+      <section class="card-section" id="payment" aria-labelledby="payment-title">
+        <div class="wrap">
+          <div class="labels reveal" aria-hidden="true">
+            <span>How</span><span>a</span><span>payment</span><span>works</span>
+          </div>
+          <h2 class="spread reveal" id="payment-title">
+            <span>On chain,</span><span>a payment</span><span><em>is a gap.</em></span>
+          </h2>
+          <p class="statement center reveal">A shielded transaction proves that a payment happened without saying who sent it, who received it, or how much moved. Here's what a wallet does to make one, and what the chain keeps.</p>
+
+          <div class="rule" aria-hidden="true"></div>
+
+          <div class="split">
+            <aside class="ledger frame" aria-label="What a shielded transaction leaves on chain">
+              <canvas class="ledger-field" id="ledger-field" aria-hidden="true"></canvas>
+              <div class="ledger-head">
+                <p class="label">On chain</p>
+                <span class="tag">Example</span>
+              </div>
+              <dl class="ledger-rows">
+                <div><dt>Nullifier</dt><dd>0x3a9f…c41e</dd></div>
+                <div><dt>Note commitment</dt><dd>0x81d0…07b3</dd></div>
+                <div><dt>KEM ciphertext</dt><dd>1,088 bytes</dd></div>
+                <div><dt>Encrypted note</dt><dd>sealed</dd></div>
+                <div><dt>STARK proof</dt><dd>≈120 KB, folded</dd></div>
+                <div><dt>Fee</dt><dd>public</dd></div>
+              </dl>
+              <p class="label">Never on chain</p>
+              <ul class="hidden-list">
+                <li>Sender</li>
+                <li>Recipient</li>
+                <li>Amount</li>
+                <li>Which note was spent</li>
+                <li>Memo</li>
+              </ul>
+            </aside>
+
+            <ol class="flow">
+              <li class="reveal">
+                <p class="label dotted">01 · Share an address</p>
+                <h3>The recipient hands over a post-quantum address</h3>
+                <p>The address carries an ML-KEM-768 public key. At about 1,900 characters it's long, so wallets share it as a QR code or a payment request.</p>
+              </li>
+              <li class="reveal">
+                <p class="label dotted">02 · Seal the note</p>
+                <h3>The sender's wallet makes a fresh secret</h3>
+                <p>It encapsulates a shared secret for that key and uses it to encrypt the note, which holds the amount, a memo, and what the recipient needs to spend it later.</p>
+              </li>
+              <li class="reveal">
+                <p class="label dotted">03 · Prove the spend</p>
+                <h3>The wallet builds a STARK</h3>
+                <p>The proof shows it owns an unspent note in the tree, that inputs equal outputs plus the fee, and that the proof belongs to this exact transaction.</p>
+              </li>
+              <li class="reveal">
+                <p class="label dotted">04 · Verify and mine</p>
+                <h3>Nodes check the proof, miners fold it</h3>
+                <p>Every node confirms the nullifier has never been seen before. Miners fold all the proofs in a block into a single block proof.</p>
+              </li>
+              <li class="reveal">
+                <p class="label dotted">05 · Receive</p>
+                <h3>One key opens one note</h3>
+                <p>The recipient's wallet tries its key on each new note. One opens. Nobody else can tell that anything arrived.</p>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="compare" aria-labelledby="compare-title">
+        <div class="wrap">
+          <div class="labels reveal" aria-hidden="true">
+            <span>Same</span><span>goal</span><span>as</span><span>ZEC and XMR</span>
+          </div>
+          <h2 class="spread reveal" id="compare-title">
+            <span>Same goal.</span><span><em>Different math.</em></span>
+          </h2>
+
+          <div class="frame table-frame reveal">
+            <div class="table-wrap">
+              <table class="compare">
+                <caption class="sr-only">XYRA compared with Zcash and Monero</caption>
+                <thead>
+                  <tr>
+                    <th scope="col"><span class="sr-only">Property</span></th>
+                    <th scope="col" class="us"><span class="us-head"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg>XYRA</span></th>
+                    <th scope="col">Zcash</th>
+                    <th scope="col">Monero</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><th scope="row">Privacy</th><td class="us">Every transaction shielded</td><td>Optional shielded pools</td><td>Private by default</td></tr>
+                  <tr><th scope="row">Stealth addresses</th><td class="us">ML-KEM-768, lattices</td><td>Elliptic-curve Diffie-Hellman</td><td>Elliptic-curve Diffie-Hellman</td></tr>
+                  <tr><th scope="row">Proofs rely on</th><td class="us">Hash functions</td><td>Discrete log, Halo 2</td><td>Discrete log</td></tr>
+                  <tr><th scope="row">Trusted setup</th><td class="us">None</td><td>None for Orchard</td><td>None</td></tr>
+                  <tr><th scope="row">Past privacy after Q-day</th><td class="us">Holds</td><td>At risk</td><td>At risk</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="numbers" aria-labelledby="numbers-title">
+        <div class="wrap">
+          <div class="labels reveal" aria-hidden="true">
+            <span>Sizes</span><span>we</span><span>design</span><span>around</span>
+          </div>
+          <h2 class="spread reveal" id="numbers-title">
+            <span>Lasting privacy</span><span><em>has a size.</em></span>
+          </h2>
+          <p class="statement center reveal">Post-quantum parts are bigger than the elliptic-curve parts they replace. These are the numbers, and how we keep them manageable.</p>
+
+          <ul class="metrics reveal">
+            <li class="metric">
+              <p class="metric-tag">Per transaction · estimate</p>
+              <p class="metric-value">50–200 KB</p>
+              <p class="metric-label">STARK spend proof, before it's folded into the block proof.</p>
+            </li>
+            <li class="metric">
+              <p class="metric-tag">Per block</p>
+              <p class="metric-value">1 proof</p>
+              <p class="metric-label">Miners fold every transaction proof into one, so nodes verify a single proof per block.</p>
+            </li>
+            <li class="metric">
+              <p class="metric-tag">Per address</p>
+              <p class="metric-value">~1,900</p>
+              <p class="metric-label">Characters in an address. The ML-KEM-768 key alone is 1,184 bytes, so wallets use QR codes.</p>
+            </li>
+            <li class="metric">
+              <p class="metric-tag">Trusted setups</p>
+              <p class="metric-value">0</p>
+              <p class="metric-label">STARKs are transparent. There's no ceremony and no secret that someone has to destroy.</p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section" id="roadmap" aria-labelledby="roadmap-title">
+        <div class="wrap">
+          <div class="labels reveal" aria-hidden="true">
+            <span>Built</span><span>in</span><span>the</span><span>open</span>
+          </div>
+          <h2 class="spread reveal" id="roadmap-title">
+            <span>The</span><span><em>roadmap.</em></span>
+          </h2>
+
+          <ol class="stories reveal">
+            <li class="story">
+              <div class="story-visual"><span>01</span></div>
+              <p class="story-meta"><span class="dotted">Phase 1</span><span>In progress</span></p>
+              <h3><em>Shielded pool library.</em> Keys, ML-KEM notes, the note tree, nullifiers, and STARK spend proofs, with a working private send and receive.</h3>
+            </li>
+            <li class="story">
+              <div class="story-visual"><span>02</span></div>
+              <p class="story-meta"><span class="dotted">Phase 2</span><span>Next</span></p>
+              <h3><em>Devnet.</em> Peer-to-peer networking, CPU mining, a mempool, and a command-line wallet.</h3>
+            </li>
+            <li class="story">
+              <div class="story-visual"><span>03</span></div>
+              <p class="story-meta"><span class="dotted">Phase 3</span><span>Planned</span></p>
+              <h3><em>Block proofs.</em> Recursive proofs that fold every transaction in a block into one.</h3>
+            </li>
+            <li class="story">
+              <div class="story-visual"><span>04</span></div>
+              <p class="story-meta"><span class="dotted">Phase 4</span><span>Planned</span></p>
+              <h3><em>Spec and audits.</em> A full written specification, review by outside cryptographers, and security audits.</h3>
+            </li>
+            <li class="story">
+              <div class="story-visual"><span>05</span></div>
+              <p class="story-meta"><span class="dotted">Phase 5</span><span>After audits</span></p>
+              <h3><em>Testnet, then mainnet.</em> An incentivized public testnet. Mainnet launches only after the audits are done.</h3>
+            </li>
+          </ol>
+
+          <div class="actions reveal">
+            <a class="btn" href="#">Design notes <span aria-hidden="true">↗</span></a>
+            <a class="btn" href="#follow">Follow along <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="faq" aria-labelledby="faq-title">
+        <div class="wrap">
+          <div class="labels reveal" aria-hidden="true">
+            <span>Things</span><span>people</span><span>keep</span><span>asking</span>
+          </div>
+          <h2 class="spread reveal" id="faq-title">
+            <span>Questions.</span><span><em>Answers.</em></span>
+          </h2>
+
+          <dl class="faq reveal">
+            <div>
+              <dt>Is anything really quantum-proof?</dt>
+              <dd>Nobody can promise forever. XYRA uses NIST's post-quantum standards and hash-based proofs, the most studied options available, and every part is designed to be upgraded if the research moves.</dd>
+            </div>
+            <div>
+              <dt>Why not ring signatures like Monero?</dt>
+              <dd>Post-quantum ring signatures exist, but they're large and hide each spend among only a small group. A shielded pool hides every spend among every note on the chain.</dd>
+            </div>
+            <div>
+              <dt>Can I prove a payment when I need to?</dt>
+              <dd>Yes. A viewing key shows chosen transactions to an auditor or an exchange without giving anyone the ability to spend.</dd>
+            </div>
+            <div>
+              <dt>When does mainnet launch?</dt>
+              <dd>After the specification is public and outside audits are complete. Follow along for testnet dates.</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <section class="contact" id="follow" aria-labelledby="follow-title">
+        <canvas id="rays" aria-hidden="true"></canvas>
+        <div class="wrap contact-grid">
+          <div class="contact-side">
+            <p class="label">Follow us</p>
+            <p class="contact-links"><a href="#">GitHub</a><a href="#">X</a></p>
+          </div>
+          <div class="contact-center">
+            <p class="label dotted">Let's build</p>
+            <h2 class="display" id="follow-title">Follow the build</h2>
+            <a class="btn" href="#">Read the design notes <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="contact-side right">
+            <p class="label">Specification</p>
+            <p class="contact-note">Published before testnet, after outside review.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <div class="wrap footer-inner">
+          <a class="brand" href="#top" aria-label="Back to top">
+            <svg class="mark" aria-hidden="true"><use href="#mark"/></svg>
+            <span class="brand-name">XYRA</span><span class="brand-sub">Labs</span>
+          </a>
+          <p class="footer-note">XYRA Labs is building XYRA in the open. Nothing on this site is an offer of tokens or financial advice. © 2026 XYRA Labs</p>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

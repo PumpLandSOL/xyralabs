@@ -1,0 +1,10 @@
+# Local app settings (machine-specific launch config)
+.claude/
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+*.log
+
+# Dependencies, if any get added later
+node_modules/
