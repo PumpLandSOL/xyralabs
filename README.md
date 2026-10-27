@@ -9,7 +9,14 @@ xyra-site/
   index.html   page structure and copy
   styles.css   design tokens and layout
   main.js      particle field, scroll choreography, carousel, rays
+  favicon.svg  the mark on an ink square
+brand/
+  xyra-mark.svg, xyra-mark-ink.svg   the mark alone, bone and ink
+  xyra-avatar*.svg / *.png           400×400 profile pictures, dark and light
+  xyra-icon-*.png                    app icons at 512 and 180
 ```
+
+The mark is an X built from two bowed rows of squares that swell toward the centre. The wordmark sets "XYRA" in Geist Medium beside it with "Labs" in Geist Mono.
 
 ## Run it locally
 
