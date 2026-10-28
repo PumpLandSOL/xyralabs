@@ -14,6 +14,8 @@ brand/
   xyra-mark.svg, xyra-mark-ink.svg   the mark alone, bone and ink
   xyra-avatar*.svg / *.png           400×400 profile pictures, dark and light
   xyra-icon-*.png                    app icons at 512 and 180
+  x/                                 X profile assets: banners at 1500×500, profile pictures at 800×800,
+                                     and a preview sheet showing them in the desktop and phone crops
 ```
 
 The mark is an X built from two bowed rows of squares that swell toward the centre. The wordmark sets "XYRA" in Geist Medium beside it with "Labs" in Geist Mono.
