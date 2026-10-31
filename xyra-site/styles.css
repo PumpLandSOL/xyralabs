@@ -37,7 +37,8 @@
   --gutter-l: max(20px, env(safe-area-inset-left, 0px));
   --gutter-r: max(20px, env(safe-area-inset-right, 0px));
   --section-gap: clamp(80px, 10vw, 140px);
-  --header-h: 64px;
+  --header-h: 72px;
+  --header-top: 16px;
 
   --dot: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='5' height='5'%3E%3Crect width='5' height='5' fill='%23ffffff'/%3E%3C/svg%3E");
 
@@ -346,57 +347,84 @@ h3 {
   text-transform: uppercase;
 }
 
-/* Header */
+/* Header: a pill floating over the page. Once the page scrolls it crunches into a
+   tighter, shorter pill and the wordmark folds down to the mark alone. */
 
 .site-header {
-  position: sticky;
-  top: env(safe-area-inset-top, 0px);
+  position: fixed;
+  top: calc(var(--header-top) + env(safe-area-inset-top, 0px));
+  left: 0;
+  right: 0;
   z-index: 20;
-  background: var(--void);
-  border-bottom: 1px solid var(--line);
+  padding-left: var(--gutter-l);
+  padding-right: var(--gutter-r);
+  pointer-events: none;
 }
 
 .nav {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 28px;
+  width: 100%;
+  max-width: var(--page-max);
   min-height: var(--header-h);
+  margin-inline: auto;
+  padding: 0 10px 0 24px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(11, 11, 11, 0.86);
+  pointer-events: auto;
+  transition: max-width 0.65s cubic-bezier(0.2, 0.7, 0.2, 1), min-height 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), padding 0.45s ease, border-color 0.3s ease;
+}
+.site-header.compact { --header-h: 56px; }
+.site-header.compact .nav {
+  max-width: 780px;
+  padding: 0 6px 0 16px;
+  border-color: var(--line-strong);
 }
 
 .brand {
   display: inline-flex;
   align-items: baseline;
   gap: 12px;
-  font-size: 15px;
+  font-size: 17px;
   font-stretch: var(--wide);
   font-weight: 500;
   letter-spacing: 0.03em;
+  transition: gap 0.4s ease;
 }
-.brand .mark { align-self: center; }
+.brand .mark { align-self: center; width: 24px; height: 24px; }
 .brand-sub {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--fog);
 }
 .brand-name, .brand-sub {
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  display: inline-block;
+  max-width: 8ch;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: max-width 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.3s ease;
 }
+.site-header.compact .brand { gap: 0; }
 .site-header.compact .brand-name,
 .site-header.compact .brand-sub {
+  max-width: 0;
   opacity: 0;
-  transform: translateX(-6px);
 }
 
 .nav nav { flex: 1; min-width: 0; }
 
 .nav-links {
   display: flex;
-  gap: 32px;
+  justify-content: center;
+  gap: 28px;
   overflow-x: auto;
   scrollbar-width: none;
-  padding-block: 8px;
+  padding-block: 4px;
 }
 .nav-links::-webkit-scrollbar { display: none; }
 
@@ -405,7 +433,7 @@ h3 {
   display: inline-block;
   padding: 16px 0;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -413,6 +441,7 @@ h3 {
   color: var(--headline);
   transition: color 160ms ease;
 }
+.nav .btn { font-size: 12px; padding: 12px 22px; }
 .nav-cta { display: none; }
 .menu-btn { display: none; }
 .nav-links a:hover { color: var(--fog); }
@@ -458,7 +487,7 @@ h3 {
   gap: 28px;
   padding-left: var(--gutter-l);
   padding-right: var(--gutter-r);
-  padding-top: var(--header-h);
+  padding-top: calc(var(--header-top) + var(--header-h));
   text-align: center;
   will-change: transform, opacity;
 }
@@ -648,6 +677,10 @@ h3 {
 
 /* Design: pinned section with a centred carousel */
 
+/* The content sits at the top of the pinned block rather than centred in it, so there is no
+   empty half-screen before the lead; the threat section's bottom padding is trimmed to match. */
+#threat { padding-bottom: 72px; }
+
 .pinned {
   position: sticky;
   top: 0;
@@ -655,8 +688,8 @@ h3 {
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding-block: calc(var(--header-h) + 40px) 60px;
+  justify-content: flex-start;
+  padding-block: calc(var(--header-top) + var(--header-h) + 40px) 60px;
   background: var(--void);
 }
 
@@ -664,6 +697,7 @@ h3 {
   display: flex;
   align-items: flex-start;
   gap: 20px;
+  margin-top: 28px;
   max-width: 30ch;
   font-size: clamp(26px, 3.1vw, 42px);
   line-height: 1.15;
@@ -856,7 +890,7 @@ h3 {
 
 .ledger {
   position: sticky;
-  top: calc(var(--header-h) + env(safe-area-inset-top, 0px) + 24px);
+  top: calc(var(--header-top) + 56px + env(safe-area-inset-top, 0px) + 24px);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -1217,19 +1251,18 @@ h3 {
 }
 
 @media (max-width: 900px) {
-  /* The section links move into a full-height panel behind a Menu button. */
+  /* The section links move into a full-screen panel behind the pill, opened by a Menu button. */
   .nav { gap: 16px; }
+  /* Negative z-index keeps the panel under the pill, inside the header's own stacking context. */
   .nav nav {
     display: none;
     position: fixed;
-    left: 0;
-    right: 0;
-    top: calc(var(--header-h) + env(safe-area-inset-top, 0px));
-    bottom: 0;
-    z-index: 19;
-    padding: 8px var(--gutter-r) 32px var(--gutter-l);
+    inset: 0;
+    z-index: -1;
+    padding: calc(var(--header-top) + var(--header-h) + 24px + env(safe-area-inset-top, 0px)) var(--gutter-r) 32px var(--gutter-l);
     background: var(--void);
     overflow-y: auto;
+    pointer-events: auto;
   }
   .site-header.menu-open nav { display: block; }
   html.menu-open { overflow: hidden; }
@@ -1260,7 +1293,7 @@ h3 {
     background: none;
     color: var(--ice);
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     cursor: pointer;

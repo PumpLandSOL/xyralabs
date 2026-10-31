@@ -494,14 +494,16 @@
     render();
   }
 
-  /* Header: wordmark collapses to the glyph once the hero is gone. */
+  /* Header: the pill crunches and the wordmark folds down to the mark once the page has
+     scrolled a little; it opens back up only near the top, so it never flickers. */
   function header() {
     var el = document.getElementById("header");
-    var heroEl = document.getElementById("top");
-    if (!el || !heroEl) return;
+    if (!el) return;
+    var compact = false;
     function update() {
-      var past = window.scrollY > (heroEl.offsetHeight || 600) * 0.6;
-      el.classList.toggle("compact", past);
+      var y = window.scrollY;
+      if (!compact && y > 120) { compact = true; el.classList.add("compact"); }
+      else if (compact && y < 40) { compact = false; el.classList.remove("compact"); }
     }
     window.addEventListener("scroll", update, { passive: true });
     update();
@@ -799,12 +801,12 @@
       /* Back and forward between section links scroll to the section too. */
       window.addEventListener("hashchange", function () {
         var t = location.hash.length > 1 && document.querySelector(location.hash);
-        if (t) lenis.scrollTo(t, { offset: location.hash === "#top" ? 0 : -64 });
+        if (t) lenis.scrollTo(t, { offset: location.hash === "#top" ? 0 : -96 });
       });
       /* A link straight to a section lands there at once instead of gliding from the top. */
       if (location.hash && location.hash.length > 1) {
         var initial = document.querySelector(location.hash);
-        if (initial) lenis.scrollTo(initial, { immediate: true, offset: location.hash === "#top" ? 0 : -64 });
+        if (initial) lenis.scrollTo(initial, { immediate: true, offset: location.hash === "#top" ? 0 : -96 });
       }
     } else {
       root.style.scrollBehavior = reduceMotion ? "auto" : "smooth";
@@ -820,7 +822,7 @@
         var target = document.querySelector(href);
         if (!target) return;
         e.preventDefault();
-        if (lenis) lenis.scrollTo(target, { offset: href === "#top" ? 0 : -64 });
+        if (lenis) lenis.scrollTo(target, { offset: href === "#top" ? 0 : -96 });
         else target.scrollIntoView();
         if (history.replaceState) history.replaceState(null, "", href);
       });
