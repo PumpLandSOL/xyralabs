@@ -9,7 +9,9 @@ xyra-site/
   index.html   page structure and copy
   styles.css   design tokens and layout
   main.js      particle field, scroll choreography, carousel, rays
-  favicon.svg  the mark on an ink square
+  favicon.svg, favicon.ico              the mark on an ink square; the .ico carries pixel-snapped 16 and 32
+  apple-touch-icon.png, icon-*.png      home-screen and install icons, listed in site.webmanifest
+  og.png       1200×630 share image for link previews
 brand/
   xyra-mark.svg, xyra-mark-ink.svg   the mark alone, bone and ink
   xyra-avatar*.svg / *.png           400×400 profile pictures, dark and light
@@ -37,4 +39,5 @@ Bone monochrome on a near-black canvas: neutral headline words in grey, highligh
 ## Still to fill in
 
 - The GitHub, X and "Read the design notes" buttons link to `#` until the real URLs exist.
-- A social share image and a real domain.
+- The real domain: `index.html` uses `https://xyralabs.example` in the canonical, Open Graph and Twitter tags until there is one. Link previews need absolute URLs, so swap it before deploying.
+- The X handle, for a `twitter:site` tag.
