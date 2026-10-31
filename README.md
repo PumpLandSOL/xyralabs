@@ -20,7 +20,9 @@ brand/
                                      and a preview sheet showing them in the desktop and phone crops
 ```
 
-The mark is an X built from two bowed rows of squares that swell toward the centre. The wordmark sets "XYRA" in Geist Medium beside it with "Labs" in Geist Mono.
+The mark is an X built from two bowed rows of squares that swell toward the centre. The wordmark sets "XYRA" in Archivo Medium at 118% width beside it with "Labs" in Geist Mono.
+
+On load the hero's dot field assembles into the mark, holds it, then disperses into the marble field as the headline wipes in. The threat section plays a three-beat scene: a payment is recorded as ciphertext, the years tick past, and it is read, while the XYRA copy beside it stays sealed. The payment card's ledger refreshes like a feed, the comparison leads with the Q-day verdict, and the roadmap is one rail with the live phase pulsing.
 
 ## Run it locally
 
@@ -34,7 +36,7 @@ Opening `index.html` straight from disk also works, but the Lenis smooth-scroll 
 
 ## Design
 
-Bone monochrome on a near-black canvas: neutral headline words in grey, highlight words, particles and rays in white, text and outlined buttons in bone, with no color anywhere. Type is Geist for display and body and Geist Mono for labels, both from Google Fonts. Everything that moves goes still for visitors who have reduced motion turned on.
+Bone monochrome on a near-black canvas: neutral headline words in grey, highlight words, particles and rays in white, text and outlined buttons in bone, with no color anywhere. Type is Archivo for display (wide) and body (normal width) and Geist Mono for labels, both from Google Fonts. Everything that moves goes still for visitors who have reduced motion turned on.
 
 ## Still to fill in
 

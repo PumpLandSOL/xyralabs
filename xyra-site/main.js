@@ -6,6 +6,21 @@
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var coarse = window.matchMedia("(pointer: coarse)").matches;
+  var lenis = null;
+
+  var HEX = "0123456789abcdef";
+  function hex(n) {
+    var s = "";
+    for (var i = 0; i < n; i++) s += HEX[(Math.random() * 16) | 0];
+    return s;
+  }
+
+  /* The mark's squares, read once from the inline symbol. */
+  function markRects() {
+    return Array.prototype.map.call(document.querySelectorAll("#mark rect"), function (r) {
+      return { x: +r.getAttribute("x"), y: +r.getAttribute("y"), w: +r.getAttribute("width"), h: +r.getAttribute("height") };
+    });
+  }
 
   /* Value noise, used by the hero field and the ledger tile. */
   var perm = new Uint8Array(512);
@@ -44,7 +59,9 @@
          + 0.2 * vnoise(x * 4.2 + t * 0.14, y * 4.2 - t * 0.11);
   }
 
-  /* Dotted field: a grid of jittered points, lit where the noise runs high. */
+  /* Dotted field: a grid of jittered points, lit where the noise runs high.
+     With opts.mark the same points can first assemble into the mark, hold it, then
+     disperse into the field: draw(t, phase) runs -1 (nothing) through 0 (the mark) to 1 (the field). */
   function makeField(canvas, opts) {
     var ctx = canvas.getContext("2d");
     if (!ctx) return null;
@@ -52,8 +69,10 @@
     var spacing = opts.spacing || 6;
     var scale = opts.scale || 230;
     var threshold = opts.threshold || 0.5;
+    var rects = opts.mark || null;
     var width = 0, height = 0, dpr = 1;
     var xs = new Float32Array(0), ys = new Float32Array(0), count = 0;
+    var inMark = new Uint8Array(0), cue = new Float32Array(0), fx = new Float32Array(0), fy = new Float32Array(0);
     var offsetX = 0, offsetY = 0;
 
     function resize() {
@@ -80,9 +99,38 @@
           i++;
         }
       }
+
+      if (rects) {
+        /* Which points fall inside the mark, drawn large at the centre, plus each point's own
+           cue and the direction it flies in from and leaves by. */
+        var size = Math.min(width * 0.5, height * 0.6, 560);
+        var s = size / 84, mx = width * 0.5 - size / 2, my = height * 0.52 - size / 2;
+        inMark = new Uint8Array(count);
+        cue = new Float32Array(count);
+        fx = new Float32Array(count);
+        fy = new Float32Array(count);
+        for (i = 0; i < count; i++) {
+          var px = (xs[i] - mx) / s + 8, py = (ys[i] - my) / s + 8, hit = 0;
+          if (px >= 8 && px <= 92 && py >= 8 && py <= 92) {
+            for (var q = 0; q < rects.length; q++) {
+              var rc = rects[q];
+              if (px >= rc.x && px <= rc.x + rc.w && py >= rc.y && py <= rc.y + rc.h) { hit = 1; break; }
+            }
+          }
+          inMark[i] = hit;
+          if (!hit) continue;
+          var cc = i % cols, rr = (i / cols) | 0;
+          cue[i] = lattice(cc * 5 + 2, rr * 3 + 11);
+          var ang = lattice(cc * 9 + 4, rr * 17 + 1) * 6.2832;
+          var dist = 50 + lattice(cc * 13 + 6, rr * 7 + 3) * 110;
+          fx[i] = Math.cos(ang) * dist;
+          fy[i] = Math.sin(ang) * dist;
+        }
+      }
     }
 
-    function draw(t) {
+    function draw(t, phase) {
+      if (phase === undefined) phase = 1;
       ctx.clearRect(0, 0, width, height);
       var inv = 1 / scale;
       var hole = opts.hole;
@@ -91,20 +139,47 @@
       var ox = offsetX * inv, oy = offsetY * inv;
       var dim = "rgba(232,228,220,";
       var bright = "rgba(255,255,255,";
+      var assembling = phase < 0;
+      var gather = assembling ? phase + 1 : 1;
+      var disperse = phase > 0 ? phase : 0;
       for (var i = 0; i < count; i++) {
-        var v = marble(xs[i] * inv + ox, ys[i] * inv + oy, t);
-        if (v <= threshold) continue;
-        var a = (v - threshold) * 5.5;
-        if (a > 1) a = 1;
-        if (hole) {
-          /* Thin the field out behind the headline so the type stays readable. */
-          var dx = (xs[i] - hx) / hrx, dy = (ys[i] - hy) / hry;
-          var d = dx * dx + dy * dy;
-          if (d < 1) { a *= d * d; if (a < 0.04) continue; }
+        if (disperse > 0) {
+          var v = marble(xs[i] * inv + ox, ys[i] * inv + oy, t);
+          if (v > threshold) {
+            var a = (v - threshold) * 5.5;
+            if (a > 1) a = 1;
+            if (hole) {
+              /* Thin the field out behind the headline so the type stays readable. */
+              var dx = (xs[i] - hx) / hrx, dy = (ys[i] - hy) / hry;
+              var d = dx * dx + dy * dy;
+              if (d < 1) a *= d * d;
+            }
+            if (a >= 0.04) {
+              var size = 1.5 + a * 1.4;
+              ctx.fillStyle = (a > 0.82 ? bright : dim) + ((0.22 + a * 0.6) * disperse).toFixed(2) + ")";
+              ctx.fillRect(xs[i] - size * 0.5, ys[i] - size * 0.5, size, size);
+            }
+          }
         }
-        var size = 1.5 + a * 1.4;
-        ctx.fillStyle = (a > 0.82 ? bright : dim) + (0.22 + a * 0.6).toFixed(2) + ")";
-        ctx.fillRect(xs[i] - size * 0.5, ys[i] - size * 0.5, size, size);
+        if (rects && inMark[i] && disperse < 1) {
+          /* Each square's point arrives and leaves on its own cue, along its own line. */
+          var e, off;
+          if (assembling) {
+            var g = Math.min(1, Math.max(0, (gather - cue[i] * 0.4) / 0.6));
+            e = 1 - Math.pow(1 - g, 3);
+            off = 1 - e;
+          } else {
+            var k = disperse <= 0 ? 0 : Math.min(1, Math.max(0, (disperse - cue[i] * 0.55) / 0.45));
+            e = 1 - k * k;
+            off = k * k;
+          }
+          if (e <= 0.001) continue;
+          var m = e * (0.86 + 0.14 * Math.sin(t * 2.6 + cue[i] * 6.2832));
+          var ms = 2.9 * (0.6 + 0.4 * e);
+          var x = xs[i] + fx[i] * off, y = ys[i] + fy[i] * off;
+          ctx.fillStyle = bright + (0.12 + 0.88 * m).toFixed(2) + ")";
+          ctx.fillRect(x - ms * 0.5, y - ms * 0.5, ms, ms);
+        }
       }
     }
 
@@ -124,7 +199,7 @@
     var section = canvas && canvas.parentElement;
     if (!canvas || !inner || !section) return;
 
-    var field = makeField(canvas, { spacing: coarse ? 7 : 6, scale: 240, threshold: 0.5, hole: true });
+    var field = makeField(canvas, { spacing: coarse ? 7 : 6, scale: 240, threshold: 0.5, hole: true, mark: reduceMotion ? null : markRects() });
     if (!field) return;
 
     var running = false, rafId = 0, tick = 0;
@@ -132,14 +207,28 @@
     var targetX = 0, targetY = 0, curX = 0, curY = 0;
     var progress = 0;
 
+    /* Intro, in seconds: the points fly in and form the mark, hold it, then disperse into the
+       field. The headline's CSS delay (--hero-delay) is timed to the dispersal. */
+    var ASSEMBLE = [0.1, 0.9], HOLD_END = 1.6, DISPERSE_END = 2.8;
+    function phaseAt(sec) {
+      if (reduceMotion) return 1;
+      if (sec < ASSEMBLE[0]) return -1;
+      if (sec < ASSEMBLE[1]) return -1 + (sec - ASSEMBLE[0]) / (ASSEMBLE[1] - ASSEMBLE[0]);
+      if (sec < HOLD_END) return 0;
+      if (sec < DISPERSE_END) return (sec - HOLD_END) / (DISPERSE_END - HOLD_END);
+      return 1;
+    }
+
     function frame(now) {
       if (!running) return;
       tick++;
-      if (tick % 2 === 0) {
+      var sec = (now - start) / 1000;
+      var ph = phaseAt(sec);
+      if (ph < 1 || tick % 2 === 0) {
         curX += (targetX - curX) * 0.05;
         curY += (targetY - curY) * 0.05;
         field.setOffset(curX * 40, curY * 30);
-        field.draw((now - start) / 1000);
+        field.draw(sec, ph);
       }
       rafId = requestAnimationFrame(frame);
     }
@@ -182,7 +271,8 @@
 
     function resize() {
       field.resize();
-      field.draw(reduceMotion ? 0 : (performance.now() - start) / 1000);
+      var sec = reduceMotion ? 0 : (performance.now() - start) / 1000;
+      field.draw(sec, phaseAt(sec));
     }
     if ("ResizeObserver" in window) new ResizeObserver(resize).observe(canvas);
     else window.addEventListener("resize", resize);
@@ -191,6 +281,205 @@
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     play();
+  }
+
+  /* The mark beside the design lead: the symbol's squares cloned in, ranked from the
+     centre out, so the build animation grows outward. Returns a function that replays it. */
+  function leadMark() {
+    var svg = document.getElementById("lead-mark");
+    var symbol = document.getElementById("mark");
+    if (!svg || !symbol) return null;
+    var ranked = Array.prototype.map.call(symbol.querySelectorAll("rect"), function (r) {
+      var cx = +r.getAttribute("x") + r.getAttribute("width") / 2;
+      var cy = +r.getAttribute("y") + r.getAttribute("height") / 2;
+      return { el: r, d: Math.hypot(cx - 50, cy - 50) };
+    }).sort(function (a, b) { return a.d - b.d; });
+    ranked.forEach(function (it, i) {
+      var c = it.el.cloneNode(false);
+      c.style.setProperty("--i", String(i));
+      svg.appendChild(c);
+    });
+    svg.classList.add("is-built");
+    return function rebuild() {
+      if (reduceMotion) return;
+      svg.classList.remove("is-built");
+      void svg.getBoundingClientRect();
+      svg.classList.add("is-built");
+    };
+  }
+
+  /* Threat scene: one payment is recorded as ciphertext, the years pass, and then it is
+     read. The XYRA copy beside it goes through the same years and stays sealed. */
+  function scene() {
+    var root = document.getElementById("scene");
+    if (!root) return;
+    var beatEl = document.getElementById("scene-beat");
+    var yearEl = document.getElementById("scene-year");
+    var replay = document.getElementById("scene-replay");
+    var curveRows = Array.prototype.slice.call(document.querySelectorAll("#scene-curve dd"));
+    var xyraRows = Array.prototype.slice.call(document.querySelectorAll("#scene-xyra dd"));
+    var stateCurve = document.getElementById("scene-state-curve");
+    var stateXyra = document.getElementById("scene-state-xyra");
+    var words = Array.prototype.slice.call(document.querySelectorAll("#threat-title span"));
+    if (!beatEl || !yearEl || !replay || curveRows.length !== xyraRows.length) return;
+
+    var RECORD = 1400, WAIT = 2000, DECRYPT = 1900;
+    var ciphers = [], rafId = 0, t0 = 0;
+
+    function cipher() { return hex(4) + " " + hex(4) + " " + hex(4) + " " + hex(4); }
+    function setBeat(i, label) {
+      beatEl.textContent = label;
+      words.forEach(function (w, k) { w.classList.toggle("is-live", k === i); });
+    }
+    function setState(el, text, cls) { el.textContent = text; el.className = "scene-state" + (cls ? " " + cls : ""); }
+    /* Resolve left to right: settled positions show the plain text, the rest keep churning. */
+    function resolved(c, plain, p) {
+      var n = Math.round(c.length * p), out = "";
+      for (var i = 0; i < c.length; i++) {
+        if (i < n) out += i < plain.length ? plain[i] : "";
+        else out += c[i] === " " ? " " : HEX[(Math.random() * 16) | 0];
+      }
+      return out;
+    }
+    function reset() {
+      ciphers = curveRows.map(cipher);
+      curveRows.concat(xyraRows).forEach(function (dd) { dd.textContent = " "; dd.classList.remove("is-plain"); });
+      yearEl.textContent = "2026";
+      setState(stateCurve, "Recorded");
+      setState(stateXyra, "Recorded");
+      replay.hidden = true;
+    }
+    function finish() {
+      curveRows.forEach(function (dd, i) {
+        dd.textContent = dd.getAttribute("data-plain");
+        dd.classList.add("is-plain");
+        xyraRows[i].textContent = ciphers[i];
+      });
+      yearEl.textContent = "2035";
+      setBeat(2, "Decrypt.");
+      setState(stateCurve, "Exposed", "is-exposed");
+      setState(stateXyra, "Still sealed", "is-sealed");
+    }
+    function frame(now) {
+      var t = now - t0;
+      if (t < RECORD) {
+        setBeat(0, "Record.");
+        curveRows.forEach(function (dd, i) {
+          var p = Math.min(1, Math.max(0, (t - i * 160) / 650));
+          var s = ciphers[i].slice(0, Math.round(ciphers[i].length * p));
+          dd.textContent = s || " ";
+          xyraRows[i].textContent = dd.textContent;
+        });
+      } else if (t < RECORD + WAIT) {
+        setBeat(1, "Wait.");
+        var p = (t - RECORD) / WAIT;
+        yearEl.textContent = String(2026 + Math.round(p * p * 9));
+        curveRows.forEach(function (dd, i) { dd.textContent = ciphers[i]; xyraRows[i].textContent = ciphers[i]; });
+        setState(stateCurve, "Copied and kept");
+        setState(stateXyra, "Copied and kept");
+      } else if (t < RECORD + WAIT + DECRYPT) {
+        setBeat(2, "Decrypt.");
+        yearEl.textContent = "2035";
+        var tt = t - RECORD - WAIT;
+        curveRows.forEach(function (dd, i) {
+          var q = Math.min(1, Math.max(0, (tt - i * 180) / 850));
+          dd.textContent = resolved(ciphers[i], dd.getAttribute("data-plain"), q);
+          if (q >= 1) dd.classList.add("is-plain");
+          /* The sealed copy churns for a moment under the same attack and settles unchanged. */
+          xyraRows[i].textContent = q > 0 && q < 1 ? resolved(ciphers[i], ciphers[i], q) : ciphers[i];
+        });
+        setState(stateCurve, "Exposed", "is-exposed");
+        setState(stateXyra, "Still sealed", "is-sealed");
+      } else {
+        finish();
+        replay.hidden = false;
+        return;
+      }
+      rafId = requestAnimationFrame(frame);
+    }
+    function play() {
+      cancelAnimationFrame(rafId);
+      reset();
+      t0 = performance.now();
+      rafId = requestAnimationFrame(frame);
+    }
+    replay.addEventListener("click", play);
+
+    if (reduceMotion || !("IntersectionObserver" in window)) { reset(); finish(); return; }
+    reset();
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { io.disconnect(); play(); } });
+    }, { threshold: 0.4 });
+    io.observe(root);
+  }
+
+  /* Payment ledger: the hashes settle in like a feed and refresh every few seconds, the
+     sizes count up, the sealed note keeps a cursor. */
+  function liveLedger() {
+    var rows = document.getElementById("ledger-rows");
+    if (!rows) return;
+    var hexes = Array.prototype.slice.call(rows.querySelectorAll("dd[data-live='hex']"));
+    var counts = Array.prototype.slice.call(rows.querySelectorAll("dd[data-live='count']"));
+    var timer = 0;
+
+    function value() { return "0x" + hex(4) + "…" + hex(4); }
+    function format(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+    function scramble(dd, target, ms) {
+      var t0 = performance.now();
+      (function step(now) {
+        var p = Math.min(1, (now - t0) / ms), n = Math.round(target.length * p), out = "";
+        for (var i = 0; i < target.length; i++) {
+          var fixed = i < n || i < 2 || target[i] === "…";
+          out += fixed ? target[i] : HEX[(Math.random() * 16) | 0];
+        }
+        dd.textContent = out;
+        if (p < 1) requestAnimationFrame(step);
+      })(t0);
+    }
+    function count(dd) {
+      var to = +dd.getAttribute("data-to");
+      var pre = dd.getAttribute("data-prefix") || "", suf = dd.getAttribute("data-suffix") || "";
+      var t0 = performance.now(), ms = 900;
+      (function step(now) {
+        var p = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - p, 3);
+        dd.textContent = pre + format(Math.round(to * e)) + suf;
+        if (p < 1) requestAnimationFrame(step);
+      })(t0);
+    }
+    function start() {
+      hexes.forEach(function (dd) { scramble(dd, value(), 700); });
+      counts.forEach(count);
+      timer = setInterval(function () { hexes.forEach(function (dd) { scramble(dd, value(), 500); }); }, 4500);
+    }
+    function stop() { clearInterval(timer); timer = 0; }
+
+    if (reduceMotion || !("IntersectionObserver" in window)) return;
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { if (!timer) start(); } else stop(); });
+    }, { threshold: 0.2 }).observe(rows);
+  }
+
+  /* Narrow screens: the section links live in a panel behind the Menu button. */
+  function menu() {
+    var btn = document.getElementById("menu-btn");
+    var el = document.getElementById("header");
+    if (!btn || !el) return;
+    function set(open) {
+      el.classList.toggle("menu-open", open);
+      root.classList.toggle("menu-open", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      btn.textContent = open ? "Close" : "Menu";
+      if (lenis) { if (open) lenis.stop(); else lenis.start(); }
+    }
+    btn.addEventListener("click", function () { set(!el.classList.contains("menu-open")); });
+    el.querySelectorAll(".nav-links a").forEach(function (a) {
+      a.addEventListener("click", function () { set(false); });
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && el.classList.contains("menu-open")) set(false);
+    });
+    var wide = window.matchMedia("(min-width: 901px)");
+    if (wide.addEventListener) wide.addEventListener("change", function (e) { if (e.matches) set(false); });
   }
 
   /* Ledger tile: a still frame of the same field inside the payment card. */
@@ -267,7 +556,7 @@
   }
 
   /* Carousel: one centred slide, neighbours dimmed, click, drag, dots, arrows. */
-  function carousel() {
+  function carousel(onChange) {
     var wrap = document.getElementById("carousel");
     var track = document.getElementById("track");
     var dotsEl = document.getElementById("dots");
@@ -317,7 +606,9 @@
       if (nameEl) nameEl.textContent = active.getAttribute("data-name") || "";
       if (detailEl) detailEl.textContent = active.getAttribute("data-meta") || "";
       layout();
+      if (onChange && started) onChange();
     }
+    var started = false;
 
     var startX = null;
     wrap.addEventListener("pointerdown", function (e) { startX = e.clientX; });
@@ -339,6 +630,7 @@
     if ("ResizeObserver" in window) new ResizeObserver(layout).observe(wrap);
     else window.addEventListener("resize", layout);
     go(index);
+    started = true;
   }
 
   /* Contact: white rays converging on the headline. */
@@ -500,7 +792,6 @@
 
   /* Smooth scrolling through Lenis when it loaded; anchors go through it too. */
   function smoothScroll() {
-    var lenis = null;
     if (window.Lenis && !reduceMotion) {
       lenis = new window.Lenis({ lerp: 0.09, wheelMultiplier: 1, smoothWheel: true });
       function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
@@ -542,7 +833,10 @@
   reveals();
   spreadWords();
   activeNav();
-  carousel();
+  carousel(leadMark());
+  scene();
+  liveLedger();
   rays();
+  menu();
   smoothScroll();
 })();

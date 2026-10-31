@@ -46,7 +46,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Geist+Mono:wght@400&display=swap">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -54,18 +54,6 @@
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="mark" viewBox="8 8 84 84">
     <g fill="currentColor"><rect x="15.7" y="10.5" width="1.8" height="1.8"/><rect x="10.5" y="15.7" width="1.8" height="1.8"/><rect x="15.7" y="87.7" width="1.8" height="1.8"/><rect x="10.5" y="82.5" width="1.8" height="1.8"/><rect x="19.56" y="13.39" width="3" height="3"/><rect x="13.39" y="19.56" width="3" height="3"/><rect x="19.56" y="83.61" width="3" height="3"/><rect x="13.39" y="77.45" width="3" height="3"/><rect x="26.56" y="19.34" width="4.12" height="4.12"/><rect x="19.34" y="26.56" width="4.12" height="4.12"/><rect x="26.56" y="76.54" width="4.12" height="4.12"/><rect x="19.34" y="69.32" width="4.12" height="4.12"/><rect x="37.27" y="29.02" width="5.13" height="5.13"/><rect x="29.02" y="37.27" width="5.13" height="5.13"/><rect x="37.27" y="65.86" width="5.13" height="5.13"/><rect x="29.02" y="57.6" width="5.13" height="5.13"/><rect x="51.59" y="42.53" width="5.88" height="5.88"/><rect x="42.53" y="51.59" width="5.88" height="5.88"/><rect x="51.59" y="51.59" width="5.88" height="5.88"/><rect x="42.53" y="42.53" width="5.88" height="5.88"/><rect x="65.86" y="57.6" width="5.13" height="5.13"/><rect x="57.6" y="65.86" width="5.13" height="5.13"/><rect x="65.86" y="37.27" width="5.13" height="5.13"/><rect x="57.6" y="29.02" width="5.13" height="5.13"/><rect x="76.54" y="69.32" width="4.12" height="4.12"/><rect x="69.32" y="76.54" width="4.12" height="4.12"/><rect x="76.54" y="26.56" width="4.12" height="4.12"/><rect x="69.32" y="19.34" width="4.12" height="4.12"/><rect x="83.61" y="77.45" width="3" height="3"/><rect x="77.45" y="83.61" width="3" height="3"/><rect x="83.61" y="19.56" width="3" height="3"/><rect x="77.45" y="13.39" width="3" height="3"/><rect x="87.7" y="82.5" width="1.8" height="1.8"/><rect x="82.5" y="87.7" width="1.8" height="1.8"/><rect x="87.7" y="15.7" width="1.8" height="1.8"/><rect x="82.5" y="10.5" width="1.8" height="1.8"/></g>
-  </symbol>
-  <symbol id="spark" viewBox="0 0 48 48">
-    <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-      <path d="M24 3v42"/>
-      <path d="M5 24h38"/>
-      <path d="M10 8l27 31"/>
-      <path d="M39 9L8 38"/>
-      <path d="M21 4l5 8"/>
-      <path d="M12 7l5 7"/>
-      <path d="M44 29l-8-3"/>
-      <path d="M6 31l9-4"/>
-    </g>
   </symbol>
 </svg>
 
@@ -77,7 +65,7 @@
       <svg class="mark" aria-hidden="true"><use href="#mark"/></svg>
       <span class="brand-name">XYRA</span><span class="brand-sub">Labs</span>
     </a>
-    <nav aria-label="Sections">
+    <nav aria-label="Sections" id="menu">
       <ul class="nav-links">
         <li><a href="#top">Home</a></li>
         <li><a href="#threat">Threat</a></li>
@@ -85,9 +73,11 @@
         <li><a href="#payment">Payments</a></li>
         <li><a href="#compare">Compare</a></li>
         <li><a href="#roadmap">Roadmap</a></li>
+        <li class="nav-cta"><a class="btn" href="#follow">Follow along <span aria-hidden="true">↗</span></a></li>
       </ul>
     </nav>
-    <a class="btn" href="#follow">Follow along <span aria-hidden="true">↗</span></a>
+    <a class="btn nav-btn" href="#follow">Follow along <span aria-hidden="true">↗</span></a>
+    <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="menu">Menu</button>
   </div>
 </header>
 
@@ -96,14 +86,13 @@
   <section class="hero" id="top" aria-labelledby="hero-title">
     <canvas id="field" aria-hidden="true"></canvas>
     <div class="hero-inner" id="hero-inner">
-      <p class="eyebrow word" style="--i:0">Layer 1 · Shielded by default · Post-quantum</p>
       <h1 class="display" id="hero-title">
-        <span class="word" style="--i:1">Privacy</span>
-        <span class="word" style="--i:2">that</span>
-        <span class="word" style="--i:3"><em>outlives</em></span>
-        <span class="word" style="--i:4">the</span>
-        <span class="word" style="--i:5">quantum</span>
-        <span class="word" style="--i:6">computer.</span>
+        <span class="word" style="--i:0">Privacy</span>
+        <span class="word" style="--i:1">that</span>
+        <span class="word" style="--i:2"><em>outlives</em></span>
+        <span class="word" style="--i:3">the</span>
+        <span class="word" style="--i:4">quantum</span>
+        <span class="word" style="--i:5">computer.</span>
       </h1>
     </div>
     <a class="scroll-cue" href="#threat" aria-label="Scroll to the threat">
@@ -122,6 +111,36 @@
           <span>Record.</span><span>Wait.</span><span><em>Decrypt.</em></span>
         </h2>
         <p class="statement center reveal">Blockchains are public and permanent. Anyone can keep a copy of every transaction and wait for a quantum computer that can run Shor's algorithm. On that day, the elliptic-curve math behind today's privacy coins stops protecting anything that was ever recorded.</p>
+
+        <div class="scene frame reveal" id="scene" aria-label="One payment, recorded today and read after Q-day">
+          <div class="scene-head">
+            <p class="label dotted"><span id="scene-beat">Record</span></p>
+            <p class="scene-year"><span class="sr-only">Year </span><span id="scene-year">2026</span></p>
+            <button class="btn btn-ghost scene-replay" type="button" id="scene-replay" hidden>Replay <span aria-hidden="true">↺</span></button>
+          </div>
+          <div class="scene-ledgers">
+            <div class="scene-ledger" id="scene-curve">
+              <p class="scene-title">A privacy coin today</p>
+              <dl class="scene-rows">
+                <div><dt>From</dt><dd data-plain="alice">&nbsp;</dd></div>
+                <div><dt>To</dt><dd data-plain="bob">&nbsp;</dd></div>
+                <div><dt>Amount</dt><dd data-plain="4.20">&nbsp;</dd></div>
+                <div><dt>Memo</dt><dd data-plain="rent, march">&nbsp;</dd></div>
+              </dl>
+              <p class="scene-state" id="scene-state-curve">On chain</p>
+            </div>
+            <div class="scene-ledger" id="scene-xyra">
+              <p class="scene-title"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg>XYRA</p>
+              <dl class="scene-rows">
+                <div><dt>From</dt><dd>&nbsp;</dd></div>
+                <div><dt>To</dt><dd>&nbsp;</dd></div>
+                <div><dt>Amount</dt><dd>&nbsp;</dd></div>
+                <div><dt>Memo</dt><dd>&nbsp;</dd></div>
+              </dl>
+              <p class="scene-state" id="scene-state-xyra">On chain</p>
+            </div>
+          </div>
+        </div>
 
         <div class="frame grid-frame reveal">
           <div class="cell">
@@ -164,7 +183,7 @@
     <section class="section pinned" id="design" aria-labelledby="design-title">
       <div class="wrap">
         <h2 class="lead reveal" id="design-title">
-          <svg class="spark" aria-hidden="true"><use href="#spark"/></svg>
+          <svg class="lead-mark" id="lead-mark" viewBox="8 8 84 84" aria-hidden="true"></svg>
           <span>Meet the <em>primitives</em> that replace every curve with <em>hashes</em> and <em>lattices</em>:</span>
         </h2>
 
@@ -248,12 +267,12 @@
                 <p class="label">On chain</p>
                 <span class="tag">Example</span>
               </div>
-              <dl class="ledger-rows">
-                <div><dt>Nullifier</dt><dd>0x3a9f…c41e</dd></div>
-                <div><dt>Note commitment</dt><dd>0x81d0…07b3</dd></div>
-                <div><dt>KEM ciphertext</dt><dd>1,088 bytes</dd></div>
-                <div><dt>Encrypted note</dt><dd>sealed</dd></div>
-                <div><dt>STARK proof</dt><dd>≈120 KB, folded</dd></div>
+              <dl class="ledger-rows" id="ledger-rows">
+                <div><dt>Nullifier</dt><dd data-live="hex">0x3a9f…c41e</dd></div>
+                <div><dt>Note commitment</dt><dd data-live="hex">0x81d0…07b3</dd></div>
+                <div><dt>KEM ciphertext</dt><dd data-live="count" data-to="1088" data-suffix=" bytes">1,088 bytes</dd></div>
+                <div><dt>Encrypted note</dt><dd><span class="cursor">sealed</span></dd></div>
+                <div><dt>STARK proof</dt><dd data-live="count" data-to="120" data-prefix="≈" data-suffix=" KB, folded">≈120 KB, folded</dd></div>
                 <div><dt>Fee</dt><dd>public</dd></div>
               </dl>
               <p class="label">Never on chain</p>
@@ -306,26 +325,41 @@
             <span>Same goal.</span><span><em>Different math.</em></span>
           </h2>
 
-          <div class="frame table-frame reveal">
-            <div class="table-wrap">
-              <table class="compare">
-                <caption class="sr-only">XYRA compared with Zcash and Monero</caption>
-                <thead>
-                  <tr>
-                    <th scope="col"><span class="sr-only">Property</span></th>
-                    <th scope="col" class="us"><span class="us-head"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg>XYRA</span></th>
-                    <th scope="col">Zcash</th>
-                    <th scope="col">Monero</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><th scope="row">Privacy</th><td class="us">Every transaction shielded</td><td>Optional shielded pools</td><td>Private by default</td></tr>
-                  <tr><th scope="row">Stealth addresses</th><td class="us">ML-KEM-768, lattices</td><td>Elliptic-curve Diffie-Hellman</td><td>Elliptic-curve Diffie-Hellman</td></tr>
-                  <tr><th scope="row">Proofs rely on</th><td class="us">Hash functions</td><td>Discrete log, Halo 2</td><td>Discrete log</td></tr>
-                  <tr><th scope="row">Trusted setup</th><td class="us">None</td><td>None for Orchard</td><td>None</td></tr>
-                  <tr><th scope="row">Past privacy after Q-day</th><td class="us">Holds</td><td>At risk</td><td>At risk</td></tr>
-                </tbody>
-              </table>
+          <p class="statement center reveal">Three shielded designs, one question that matters once the ciphertext has been copied: does what was recorded stay private?</p>
+
+          <div class="verdict reveal">
+            <div class="verdict-col us">
+              <p class="verdict-name"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg>XYRA</p>
+              <p class="verdict-word">Holds</p>
+              <p class="verdict-q">Past privacy after Q-day</p>
+              <dl class="verdict-rows">
+                <div><dt>Privacy</dt><dd>Every transaction shielded</dd></div>
+                <div><dt>Stealth addresses</dt><dd>ML-KEM-768, lattices</dd></div>
+                <div><dt>Proofs rely on</dt><dd>Hash functions</dd></div>
+                <div><dt>Trusted setup</dt><dd>None</dd></div>
+              </dl>
+            </div>
+            <div class="verdict-col">
+              <p class="verdict-name">Zcash</p>
+              <p class="verdict-word">At risk</p>
+              <p class="verdict-q">Past privacy after Q-day</p>
+              <dl class="verdict-rows">
+                <div><dt>Privacy</dt><dd>Optional shielded pools</dd></div>
+                <div><dt>Stealth addresses</dt><dd>Elliptic-curve Diffie-Hellman</dd></div>
+                <div><dt>Proofs rely on</dt><dd>Discrete log, Halo 2</dd></div>
+                <div><dt>Trusted setup</dt><dd>None for Orchard</dd></div>
+              </dl>
+            </div>
+            <div class="verdict-col">
+              <p class="verdict-name">Monero</p>
+              <p class="verdict-word">At risk</p>
+              <p class="verdict-q">Past privacy after Q-day</p>
+              <dl class="verdict-rows">
+                <div><dt>Privacy</dt><dd>Private by default</dd></div>
+                <div><dt>Stealth addresses</dt><dd>Elliptic-curve Diffie-Hellman</dd></div>
+                <div><dt>Proofs rely on</dt><dd>Discrete log</dd></div>
+                <div><dt>Trusted setup</dt><dd>None</dd></div>
+              </dl>
             </div>
           </div>
         </div>
@@ -375,30 +409,30 @@
             <span>The</span><span><em>roadmap.</em></span>
           </h2>
 
-          <ol class="stories reveal">
-            <li class="story">
-              <div class="story-visual"><span>01</span></div>
-              <p class="story-meta"><span class="dotted">Phase 1</span><span>In progress</span></p>
+          <ol class="rail reveal">
+            <li class="phase is-live">
+              <span class="tick" aria-hidden="true"></span>
+              <p class="phase-meta"><span>Phase 1</span><span>In progress</span></p>
               <h3><em>Shielded pool library.</em> Keys, ML-KEM notes, the note tree, nullifiers, and STARK spend proofs, with a working private send and receive.</h3>
             </li>
-            <li class="story">
-              <div class="story-visual"><span>02</span></div>
-              <p class="story-meta"><span class="dotted">Phase 2</span><span>Next</span></p>
+            <li class="phase">
+              <span class="tick" aria-hidden="true"></span>
+              <p class="phase-meta"><span>Phase 2</span><span>Next</span></p>
               <h3><em>Devnet.</em> Peer-to-peer networking, CPU mining, a mempool, and a command-line wallet.</h3>
             </li>
-            <li class="story">
-              <div class="story-visual"><span>03</span></div>
-              <p class="story-meta"><span class="dotted">Phase 3</span><span>Planned</span></p>
+            <li class="phase">
+              <span class="tick" aria-hidden="true"></span>
+              <p class="phase-meta"><span>Phase 3</span><span>Planned</span></p>
               <h3><em>Block proofs.</em> Recursive proofs that fold every transaction in a block into one.</h3>
             </li>
-            <li class="story">
-              <div class="story-visual"><span>04</span></div>
-              <p class="story-meta"><span class="dotted">Phase 4</span><span>Planned</span></p>
+            <li class="phase">
+              <span class="tick" aria-hidden="true"></span>
+              <p class="phase-meta"><span>Phase 4</span><span>Planned</span></p>
               <h3><em>Spec and audits.</em> A full written specification, review by outside cryptographers, and security audits.</h3>
             </li>
-            <li class="story">
-              <div class="story-visual"><span>05</span></div>
-              <p class="story-meta"><span class="dotted">Phase 5</span><span>After audits</span></p>
+            <li class="phase">
+              <span class="tick" aria-hidden="true"></span>
+              <p class="phase-meta"><span>Phase 5</span><span>After audits</span></p>
               <h3><em>Testnet, then mainnet.</em> An incentivized public testnet. Mainnet launches only after the audits are done.</h3>
             </li>
           </ol>
