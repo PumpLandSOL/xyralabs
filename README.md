@@ -41,5 +41,5 @@ Bone monochrome on a near-black canvas: neutral headline words in grey, highligh
 ## Still to fill in
 
 - The GitHub, X and "Read the design notes" buttons link to `#` until the real URLs exist.
-- The real domain: `index.html` uses `https://xyralabs.example` in the canonical, Open Graph and Twitter tags until there is one. Link previews need absolute URLs, so swap it before deploying.
+- The custom domain: `index.html` points its canonical, Open Graph and Twitter tags at `https://xyralabs.vercel.app`, the current deployment. Swap every occurrence for the custom domain once it is live, since link previews need absolute URLs.
 - The X handle, for a `twitter:site` tag.
