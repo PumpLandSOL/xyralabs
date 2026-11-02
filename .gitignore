@@ -8,3 +8,4 @@ Thumbs.db
 
 # Dependencies, if any get added later
 node_modules/
+_studio/frames-*/
